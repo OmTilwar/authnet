@@ -17,7 +17,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 BACKBONE = "resnet18"           # Pre-trained backbone
 EMBEDDING_DIM = 128             # Output embedding dimension
 PRETRAINED = True               # Use ImageNet pre-trained weights
-FREEZE_LAYERS = ["layer1", "layer2"]  # Freeze early layers
+FREEZE_LAYERS = ["layer1"]            # Freeze only the earliest layer
 
 # ──────────────────────────────────────────────
 # Training Hyperparameters
@@ -29,7 +29,8 @@ LR_HEAD = 1e-3                  # Learning rate for embedding head
 WEIGHT_DECAY = 1e-4             # L2 regularization
 MARGIN = 0.2                    # Triplet loss margin
 MINING_TYPE = "semihard"        # Triplet mining strategy: "semihard", "hard", "all"
-SAMPLES_PER_CLASS = 4           # For MPerClassSampler (min images per class in batch)
+SAMPLES_PER_CLASS = 8           # For MPerClassSampler (min images per class in batch)
+LOSS_TYPE = "multi_similarity"  # "triplet" or "multi_similarity"
 PATIENCE = 7                    # Early stopping patience (epochs)
 
 # ──────────────────────────────────────────────

@@ -20,7 +20,7 @@ Input Image (3 × 224 × 224)
         │
         ▼
 ┌─────────────────────┐
-│  ResNet-18 Backbone  │  ← ImageNet pre-trained (layer1-2 frozen)
+│  ResNet-18 Backbone  │  ← ImageNet pre-trained (layer1 frozen)
 │  Output: 512-dim     │
 └─────────────────────┘
         │
@@ -39,8 +39,8 @@ Input Image (3 × 224 × 224)
 ```
 
 **Training Pipeline:**
-- **Loss**: Triplet Margin Loss (margin=0.2) from `pytorch-metric-learning`
-- **Mining**: Semi-hard negative mining via `TripletMarginMiner`
+- **Loss**: Multi-Similarity Loss (alpha=2, beta=50) from `pytorch-metric-learning`
+- **Mining**: `MultiSimilarityMiner` (epsilon=0.1) — mines all informative positive/negative pairs
 - **Sampling**: `MPerClassSampler` (8 samples/class per batch) for balanced training
 - **Scheduler**: Cosine Annealing with differential learning rates (backbone: 1e-4, head: 1e-3)
 
@@ -52,22 +52,22 @@ Input Image (3 × 224 × 224)
 
 | Metric | Value |
 |:-------|:------|
-| **Recall@1** | **56.22%** |
-| **Recall@2** | 67.66% |
-| **Recall@4** | 76.06% |
-| **Recall@8** | 81.76% |
-| **mAP** | 40.66% |
-| **NMI** | 0.649 |
+| **Recall@1** | **64.52%** |
+| **Recall@2** | 73.88% |
+| **Recall@4** | 80.16% |
+| **Recall@8** | 84.10% |
+| **mAP** | 48.97% |
+| **NMI** | 0.697 |
 | Classes | 47 (DTD textures) |
 | Test Samples | 1,880 |
 
-> With 47 classes, random chance Recall@1 would be ~2.1%. Our model achieves **27x improvement over random baseline**.
+> With 47 classes, random chance Recall@1 would be ~2.1%. Our model achieves **31x improvement over random baseline**.
 
 ### Training Curves
 
-![Training curves showing loss convergence, Recall@K improvement, and decreasing triplet mining over 27 epochs](outputs/visualizations/training_curves.png)
+![Training curves showing loss convergence, Recall@K improvement, and decreasing pair mining over 40 epochs](outputs/visualizations/training_curves.png)
 
-Training converged in **27 epochs** (early stopping, patience=7) on an NVIDIA RTX 4050 in ~15 minutes. The decreasing number of semi-hard triplets mined per epoch confirms the model progressively separates texture classes in embedding space.
+Trained for **40 epochs** on an NVIDIA RTX 4050 in ~25 minutes using Multi-Similarity Loss. The decreasing number of mined pairs per epoch confirms the model progressively separates texture classes in embedding space.
 
 ### t-SNE Embedding Visualization
 

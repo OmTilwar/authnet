@@ -82,7 +82,7 @@ def train_one_epoch(
         
         pbar.set_postfix({
             'loss': f'{loss.item():.4f}',
-            'triplets': num_triplets,
+            'mined': num_triplets,
         })
     
     elapsed = time.time() - start_time
@@ -175,11 +175,17 @@ def train(
         model = build_model(device)
     
     # ── Loss & Miner ──
-    loss_func = losses.TripletMarginLoss(margin=config.MARGIN)
-    miner = miners.TripletMarginMiner(
-        margin=config.MARGIN,
-        type_of_triplets=config.MINING_TYPE,
-    )
+    if config.LOSS_TYPE == "multi_similarity":
+        loss_func = losses.MultiSimilarityLoss(alpha=2, beta=50, base=0.5)
+        miner = miners.MultiSimilarityMiner(epsilon=0.1)
+        print(f"Loss: MultiSimilarityLoss | Miner: MultiSimilarityMiner")
+    else:
+        loss_func = losses.TripletMarginLoss(margin=config.MARGIN)
+        miner = miners.TripletMarginMiner(
+            margin=config.MARGIN,
+            type_of_triplets=config.MINING_TYPE,
+        )
+        print(f"Loss: TripletMarginLoss | Miner: TripletMarginMiner")
     
     # ── Optimizer ──
     param_groups = model.get_parameter_groups()
